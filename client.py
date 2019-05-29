@@ -3,16 +3,18 @@ import os
 import subprocess
 import requests
 
-from TVD_Distributed.config import SERVER_IP
+from TVD_Distributed.config import SERVER_IP, VIRTUAL_ENV
+
 
 def download_file(url):
     local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter below
+    print(local_filename)
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
-                if chunk: # filter out keep-alive new chunks
+                if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
                     # f.flush()
     return local_filename
@@ -28,13 +30,21 @@ def request_to_server():
     print(r)
 
 
-def dependency_request():
+def create_virtual_env():
+    # os.system('mkdir ' + VIRTUAL_ENV)
+    os.system('cd')
 
-    url = SERVER_IP + 'requirements/'
+
+def dependency_request():
+    url = SERVER_IP + '/requirements/'
 
     r = requests.get(url=url)
     print(r.status_code)
+    print(r.text)
     os.system('ls')
+    c_url = SERVER_IP + r.text
+    file_name = download_file(c_url)
+    print(file_name)
 
 
 if __name__ == '__main__':
