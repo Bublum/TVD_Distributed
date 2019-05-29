@@ -3,7 +3,7 @@ import os
 import subprocess
 import requests
 
-from TVD_Distributed.config import SERVER_IP, VIRTUAL_ENV
+from TVD_Distributed.config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE
 
 
 def download_file(url):
@@ -12,8 +12,13 @@ def download_file(url):
     print(local_filename)
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
-        with open(local_filename, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192):
+        file_path = os.path.join(DATA_PATH, local_filename)
+        print(file_path)
+        counter = 1
+        with open(os.path.join(DATA_PATH, local_filename), 'wb') as f:
+            for chunk in r.iter_content(chunk_size=DATA_CHUNK_SIZE):
+                print(counter*81920/1024)
+                counter+=1
                 if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
                     # f.flush()
@@ -31,8 +36,15 @@ def request_to_server():
 
 
 def create_virtual_env():
-    # os.system('mkdir ' + VIRTUAL_ENV)
-    os.system('cd')
+    cd_command = 'cd ' + VIRTUAL_ENV_PATH + ';pwd;'
+    create_command = 'virtualenv -p python3 {0};'.format(V_ENV)
+
+    activate_command = 'source {0}/bin/activate;'.format(V_ENV)
+
+    command = cd_command + create_command + activate_command
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+    proc_stdout = process.communicate()[0].strip().decode("utf-8")
+    print(proc_stdout)
 
 
 def dependency_request():
@@ -40,13 +52,17 @@ def dependency_request():
 
     r = requests.get(url=url)
     print(r.status_code)
-    print(r.text)
-    os.system('ls')
-    c_url = SERVER_IP + r.text
+    response = json.loads(r.text)
+    print(response)
+    # os.system('ls')
+    c_url = SERVER_IP + response['url']
     file_name = download_file(c_url)
-    print(file_name)
+    print('Done')
 
 
 if __name__ == '__main__':
-    pass
+
+    if CREATE_VIRTUAL_ENV:
+        create_virtual_env()
+
     dependency_request()
