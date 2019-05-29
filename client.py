@@ -1,11 +1,10 @@
 import json
 import os
-import re
 import subprocess
 import requests
 import zipfile
 
-from TVD_Distributed.config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE
+from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE
 
 
 def download_file(url):
