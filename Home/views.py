@@ -56,6 +56,7 @@ def requirements(request):
         for item in files:
             f.write("%s\n" % item)
         zipf.write('requirements.txt')
+    os.remove('requirements.txt')
 
     zipf.close()
 
