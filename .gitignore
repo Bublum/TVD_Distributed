@@ -1,2 +1,4 @@
 .idea*
 *.xml
+data/*
+virtual_environments/*
