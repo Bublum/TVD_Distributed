@@ -1,9 +1,8 @@
+import json
 import os
 import zipfile
 
 from django.http import HttpResponse
-
-import json
 
 from Home.models import Progress
 from TVD_Distributed.settings import MEDIA_ROOT, MEDIA_URL
@@ -20,28 +19,46 @@ def get_client_ip(request):
 
 def requirements(request):
     client_ip = get_client_ip(request)
-    progress_obj = Progress.objects.get_or_create(ip=client_ip)
-    progress_obj.status = 0
+    progress_obj = Progress.objects.get_or_create(ip=client_ip)[0]
+    progress_obj.status_type = 0
     progress_obj.save()
 
     filename = 'requirements.zip'
     zipf = zipfile.ZipFile(os.path.join(MEDIA_ROOT, filename), 'w', zipfile.ZIP_DEFLATED)
-    path = '/home/shibashis/DMW/'
 
-    files = ["/home/shibashis/Downloads/tensorflow-1.13.1-cp35-cp35m-manylinux1_x86_64.whl",
-             "/home/shibashis/Downloads/six-1.12.0-py2.py3-none-any.whl",
-             "/home/shibashis/Downloads/numpy-1.16.4-cp35-cp35m-manylinux1_x86_64.whl",
-             "/home/shibashis/Downloads/wheel-0.33.4-py2.py3-none-any.whl",
-             "/home/shibashis/Downloads/setuptools-41.0.1-py2.py3-none-any.whl",
-             "/home/shibashis/Downloads/mock-3.0.5-py2.py3-none-any.whl",
-             "/home/shibashis/Downloads/Keras_Applications-1.0.7-py2.py3-none-any.whl",
-             "/home/shibashis/Downloads/Keras_Preprocessing-1.0.9-py2.py3-none-any.whl",
-             "/home/shibashis/VirtualEnv/TVD_Distributed/requirements.txt"]
+    # files = ["/home/shibashis/Downloads/tensorflow-1.13.1-cp35-cp35m-manylinux1_x86_64.whl",
+    #          "/home/shibashis/Downloads/six-1.12.0-py2.py3-none-any.whl",
+    #          "/home/shibashis/Downloads/numpy-1.16.4-cp35-cp35m-manylinux1_x86_64.whl",
+    #          "/home/shibashis/Downloads/wheel-0.33.4-py2.py3-none-any.whl",
+    #          "/home/shibashis/Downloads/setuptools-41.0.1-py2.py3-none-any.whl",
+    #          "/home/shibashis/Downloads/mock-3.0.5-py2.py3-none-any.whl",
+    #          "/home/shibashis/Downloads/Keras_Applications-1.0.7-py2.py3-none-any.whl",
+    #          "/home/shibashis/Downloads/Keras_Preprocessing-1.0.9-py2.py3-none-any.whl",
+    #          "/home/shibashis/VirtualEnv/TVD_Distributed/requirements.txt"]
+    #
+    # for file in files:
+    #     fdir, fname = os.path.split(file)
+    #     zipf.write(file, fname)
+    # zipf.close()
 
-    for file in files:
-        fdir, fname = os.path.split(file)
-        zipf.write(file, fname)
+    folder_path_to_send = 'requirements'
+    files = []
+    for dirpath, dirnames, filenames in os.walk(folder_path_to_send):
+        for name in filenames:
+            path = os.path.normpath(os.path.join(dirpath, name))
+            if os.path.isfile(path):
+                files += [name]
+                zipf.write(os.path.join(dirpath, name),
+                           os.path.join(dirpath.replace(folder_path_to_send, ''), name))
+
+    with open('requirements.txt', 'w') as f:
+        files = sorted(files)
+        for item in files:
+            f.write("%s\n" % item)
+        zipf.write('requirements.txt')
+
     zipf.close()
+
     response = {
         'url': MEDIA_URL + filename,
         'file': 'requirements.txt'
@@ -54,11 +71,13 @@ def get_files(request):
         folder_path_to_send = MEDIA_ROOT + '/to_send/helmet/'
         filename = 'get_files.zip'
         zipf = zipfile.ZipFile(os.path.join(MEDIA_ROOT, filename), 'w', zipfile.ZIP_DEFLATED)
-        files = os.listdir(folder_path_to_send)
 
-        for file in files:
-            zipf.write(os.path.join(folder_path_to_send, file), file)
-
+        for dirpath, dirnames, filenames in os.walk(folder_path_to_send):
+            for name in filenames:
+                path = os.path.normpath(os.path.join(dirpath, name))
+                if os.path.isfile(path):
+                    zipf.write(os.path.join(dirpath, name),
+                               os.path.join(dirpath.replace(folder_path_to_send, ''), name))
         zipf.close()
 
         return HttpResponse(MEDIA_URL + filename)
@@ -75,8 +94,8 @@ def get_status(request):
         elif each.status_type == 0:
             result['status'] = 'No'
     return HttpResponse(json.dumps(result))
-        # // var
-    # result = "[{\"uid\": 1, \"status\": \"done\"},\
+    # // var
+    # result = "[{\"uid\": 1, \"status\": \"done\"},\K
     #                    //             {\"uid\": 2, \"status\": \"done\"},\
     #                    //             {\"uid\": 4, \"status\": \"processing\"},\
     #                    //             {\"uid\": 5, \"status\": \"No\"},\n\
@@ -85,4 +104,3 @@ def get_status(request):
     #                    //             {\"uid\": 8, \"status\": \"No\"},\n\
     #                    //             {\"uid\": 9, \"status\": \"done\"},\n \
     #                    //             {\"uid\": 10, \"status\": \"processing\"}]";
-

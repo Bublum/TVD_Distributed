@@ -5,7 +5,7 @@ from django.db import models
 
 class Progress(models.Model):
     ip = models.CharField(max_length=20)
-    status_type = models.IntegerField()
+    status_type = models.IntegerField(null=True)
     percent = models.FloatField(default=0.0)
     is_active = models.BooleanField(default=True)
 
