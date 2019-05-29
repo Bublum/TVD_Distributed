@@ -38,7 +38,7 @@ def request_assets_for_processing():
 def execute_file():
     dir = PROCESSING_DIR
     files = os.listdir(dir)
-    
+
 
 
 def send_file(files):
