@@ -7,19 +7,19 @@ import zipfile
 from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE
 
 
-def download_file(url):
+def download_file(url, path):
     local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter below
     print(local_filename)
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
-        file_path = os.path.join(DATA_PATH, local_filename)
+        file_path = os.path.join(DATA_PATH, path, local_filename)
         print(file_path)
         counter = 1
-        with open(os.path.join(DATA_PATH, local_filename), 'wb') as f:
+        with open(file_path, 'wb') as f:
             for chunk in r.iter_content(chunk_size=DATA_CHUNK_SIZE):
-                print(counter*81920/1024)
-                counter+=1
+                print(counter * 81920 / 1024)
+                counter += 1
                 if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
                     # f.flush()
@@ -27,9 +27,8 @@ def download_file(url):
 
 
 def request_assets_for_processing():
-
     file_url = requests.get(url=SERVER_IP + '/get_files/')
-    url = SERVER_IP +  file_url.text
+    url = SERVER_IP + file_url.text
     print(url)
     downloaded_file = download_file(url)
 
@@ -42,10 +41,9 @@ def execute_file():
     files = os.listdir(dir)
 
 
-
 def send_file(files):
     for file in files:
-        with open(file,'rb') as f:
+        with open(file, 'rb') as f:
             r = requests.post(URL, files={file: f})
 
 
@@ -70,7 +68,7 @@ def dependency_request():
     print(response)
     # os.system('ls')
     c_url = SERVER_IP + response['url']
-    file_name = download_file(c_url)
+    file_name = download_file(c_url, 'requirements')
     print('Done')
 
 
