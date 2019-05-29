@@ -5,5 +5,6 @@ app_name = 'detection'
 
 urlpatterns = [
     # url(r'/', views.homepage, name='homepage'),
-    url(r'requirements/$', views.requirements, name='requirements')
+    url(r'^requirements/$', views.requirements, name='requirements'),
+    url(r'^zip/$', views.zip, name='zip')
 ]
