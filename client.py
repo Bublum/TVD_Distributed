@@ -2,6 +2,8 @@ import json
 import subprocess
 import requests
 
+
+
 def request_to_server():
     URL = "http://maps.googleapis.com/maps/api/geocode/json"
 
@@ -10,6 +12,11 @@ def request_to_server():
     r = requests.post(url=URL, data=data)
 
     print(r)
+
+
+def dependency_request():
+
+
 
 
 if __name__ == '__main__':
