@@ -17,7 +17,7 @@ def request_to_server():
 
 def dependency_request():
 
-    url = SERVER_IP + '/requirements'
+    url = SERVER_IP + 'requirements/'
 
 
 if __name__ == '__main__':
