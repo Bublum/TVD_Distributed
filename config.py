@@ -13,7 +13,6 @@ DATA_CHUNK_SIZE = 8192
 
 
 
-
 # Virtaul Environment Configuration
 VIRTUAL_ENV_PATH = 'virtual_environments'
 V_ENV = 'test_env'
