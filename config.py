@@ -3,7 +3,7 @@ SERVER_IP = 'http://192.168.0.108:8000'
 
 
 #Client Configuration
-DATA_PATH = 'data'
+DATA_PATH = 'client_data/'
 DATA_CHUNK_SIZE = 8192
 
 
