@@ -6,7 +6,7 @@ SERVER_IP = 'http://192.168.0.108:8000'
 DATA_PATH = 'client_data/'
 DATA_CHUNK_SIZE = 8192
 
-
+REQUIREMENTS_PATH = 'requirements'
 
 
 

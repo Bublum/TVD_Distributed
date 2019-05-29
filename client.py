@@ -4,7 +4,7 @@ import subprocess
 import requests
 import zipfile
 
-from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE
+from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE, REQUIREMENTS_PATH
 
 
 def download_file(url, path):
@@ -62,15 +62,27 @@ def create_virtual_env():
 def dependency_request():
     url = SERVER_IP + '/requirements/'
 
-    r = requests.get(url=url)
-    print(r.status_code)
-    response = json.loads(r.text)
-    print(response)
-    # os.system('ls')
-    c_url = SERVER_IP + response['url']
-    file_name = download_file(c_url, 'requirements')
+    # r = requests.get(url=url)
+    # print(r.status_code)
+    # response = json.loads(r.text)
+    # print(response)
+    # # os.system('ls')
+    # c_url = SERVER_IP + response['url']
+    # downloaded_file = download_file(c_url, requirements_path)
     print('Done')
+    # with zipfile.ZipFile(os.path.join(DATA_PATH, REQUIREMENTS_PATH,'requirements.zip'), 'r') as z:
+    #     z.extractall(path=os.path.join(DATA_PATH, REQUIREMENTS_PATH))
 
+    file_path = os.path.join(DATA_PATH, REQUIREMENTS_PATH, 'requirements.txt')
+    f = open(file_path, 'r')
+    command = '. /{0}/{1}/bin/activate;pip3 --version;'.format(VIRTUAL_ENV_PATH, V_ENV)
+    # for each in f:
+    #     print(each[:-1])
+    #     command += 'pip3 install {0};'.format(each[:-1])
+    print(command)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE,shell=True)
+    proc_stdout = process.communicate()[0].strip().decode("utf-8")
+    print(proc_stdout)
 
 if __name__ == '__main__':
     # pass
