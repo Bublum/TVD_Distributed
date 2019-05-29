@@ -1,10 +1,10 @@
 #Server Configuration
-SERVER_IP = 'http://192.168.0.108:8000'
+SERVER_IP = 'http://192.168.0.109:8000'
 
 
 #Client Configuration
-DATA_PATH = 'client_data/'
-PROCESSING_PATH = 'client_processing/'
+DATA_PATH = 'client_data'
+PROCESSING_PATH = 'client_processing'
 DATA_CHUNK_SIZE = 8192
 
 

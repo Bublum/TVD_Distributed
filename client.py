@@ -1,10 +1,11 @@
 import json
 import os
+import shutil
 import subprocess
 import requests
 import zipfile
 
-from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE,PROCESSING_PATH
+from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE, PROCESSING_PATH
 
 
 def download_file(url, path):
@@ -30,21 +31,42 @@ def request_assets_for_processing():
     file_url = requests.get(url=SERVER_IP + '/get_files/')
     url = SERVER_IP + file_url.text
     print(url)
-    downloaded_file = download_file(url)
+    save_zip_to = os.path.join(PROCESSING_PATH, 'ZIP')
+    downloaded_file = download_file(url, save_zip_to)
 
-    with zipfile.ZipFile(downloaded_file, 'r') as z:
-        print(z.extractall(path=DATA_PATH + PROCESSING_PATH))
+    with zipfile.ZipFile(os.path.join(DATA_PATH,save_zip_to, downloaded_file), 'r') as z:
+        z.extractall(path=os.path.join(DATA_PATH, PROCESSING_PATH))
 
 
 def execute_file():
-    dir = DATA_PATH + PROCESSING_PATH
-    files = os.listdir(dir)
+    dir = os.path.join(DATA_PATH, PROCESSING_PATH) + '/'
+    print(dir)
+    code_files = []
+    code_file = ''
+    for entry in os.listdir(dir):
+        if os.path.isfile(os.path.join(dir, entry)):
+            code_files.append(entry)
+    if code_files:
+        code_file = code_files[0]
+
+    code_file_path = os.path.join(DATA_PATH,PROCESSING_PATH,code_file)
+    if(os.system('python3 ' + code_file_path) == 0):
+        # send output.zip to server
+        output_zip_path = os.path.join(DATA_PATH,PROCESSING_PATH,'output','output.zip')
+        with open(output_zip_path,'r') as f:
+            r = requests.post(SERVER_IP + '/from_client/', files={output_zip_path : f})
+        # delete everything under client_processing
+
+        # request_assets_for_processing
+        request_assets_for_processing()
+    else:
+        print('Code has errors')
 
 
 def send_file(files):
     for file in files:
         with open(file, 'rb') as f:
-            r = requests.post(URL, files={file: f})
+            r = requests.post(SERVER_IP + '/' + '', files={file: f})
 
 
 def create_virtual_env():
@@ -79,4 +101,8 @@ if __name__ == '__main__':
     if CREATE_VIRTUAL_ENV:
         create_virtual_env()
 
-    dependency_request()
+    # dependency_request()
+
+    request_assets_for_processing()
+    # execute_file()
+    # shutil.make_archive('test_zip', 'zip', 'client_data/client_processing/')
