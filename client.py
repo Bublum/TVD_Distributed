@@ -6,6 +6,7 @@ import requests
 import zipfile
 
 from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE, PROCESSING_PATH
+from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE, REQUIREMENTS_PATH
 
 
 def download_file(url, path):
@@ -19,7 +20,7 @@ def download_file(url, path):
         counter = 1
         with open(file_path, 'wb') as f:
             for chunk in r.iter_content(chunk_size=DATA_CHUNK_SIZE):
-                print(counter * 81920 / 1024)
+                print(counter * DATA_CHUNK_SIZE / 1024)
                 counter += 1
                 if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
@@ -84,14 +85,35 @@ def create_virtual_env():
 def dependency_request():
     url = SERVER_IP + '/requirements/'
 
-    r = requests.get(url=url)
-    print(r.status_code)
-    response = json.loads(r.text)
-    print(response)
-    # os.system('ls')
-    c_url = SERVER_IP + response['url']
-    file_name = download_file(c_url, 'requirements')
+    # r = requests.get(url=url)
+    # print(r.status_code)
+    # response = json.loads(r.text)
+    # print(response)
+    # # os.system('ls')
+    # c_url = SERVER_IP + response['url']
+    # downloaded_file = download_file(c_url, requirements_path)
     print('Done')
+    # with zipfile.ZipFile(os.path.join(DATA_PATH, REQUIREMENTS_PATH,'requirements.zip'), 'r') as z:
+    #     z.extractall(path=os.path.join(DATA_PATH, REQUIREMENTS_PATH))
+
+    file_path = os.path.join(DATA_PATH, REQUIREMENTS_PATH, 'requirements.txt')
+    f = open(file_path, 'r')
+    pip_command = '{0}/{1}/bin/pip install '.format(VIRTUAL_ENV_PATH, V_ENV)
+    # command = '{0}/{1}/bin/pip install'.format(VIRTUAL_ENV_PATH, V_ENV)
+    command = ''
+    for each in f:
+        print(each[:-1])
+        command = pip_command + os.path.join(DATA_PATH, REQUIREMENTS_PATH, each[:-1])
+        print(command)
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+        # for line in iter(process.stdout.readline, b''):  # replace '' with b'' for Python 3
+        #     print(line.decode('utf-8'))
+        #     if line.decode('utf-8').lower().__contains__('would'):
+        #         print('contains')
+        #         process.stdin.write(str.encode('y\n'))
+        proc_stdout = process.communicate()[0].strip().decode("utf-8")
+        print(proc_stdout)
+    print(command)
 
 
 if __name__ == '__main__':

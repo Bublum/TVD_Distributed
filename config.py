@@ -7,7 +7,7 @@ DATA_PATH = 'client_data'
 PROCESSING_PATH = 'client_processing'
 DATA_CHUNK_SIZE = 8192
 
-
+REQUIREMENTS_PATH = 'requirements'
 
 
 
