@@ -1,16 +1,23 @@
 import json
 import subprocess
 import requests
+import urllib.request
+
+URL = 'http://192.168.0.109:8000/get_files/'
+
 
 def request_to_server():
-    URL = "http://maps.googleapis.com/maps/api/geocode/json"
+    # data = json.dumps({'type': 'free'})
 
-    data = json.dumps({'type': 'request_file'})
+    file_names = requests.get(url=URL)
 
-    r = requests.post(url=URL, data=data)
+    print(file_names.content.decode('utf-8'))
+    # files = file_names['file_names']
 
-    print(r)
+    # urllib.request.urlretrieve(file_url, file_name)
+    #
+    # print(r)
 
 
 if __name__ == '__main__':
-    pass
+    request_to_server()
