@@ -68,8 +68,12 @@ def get_status(request):
     result = {}
     for each in Progress.objects.all():
         result['uid'] = each.ip
-        result['status'] = 'done' if each.status_type == 2 else result[
-            'status'] = 'processing' if each.status_type == 1 else result['status'] = 'No'
+        if each.status_type == 2:
+            result['status'] = 'done'
+        elif each.status_type == 1:
+            result['status'] = 'processing'
+        elif each.status_type == 0:
+            result['status'] = 'No'
     return HttpResponse(json.dumps(result))
         # // var
     # result = "[{\"uid\": 1, \"status\": \"done\"},\
