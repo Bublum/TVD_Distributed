@@ -5,8 +5,19 @@ import io
 from django.http import HttpResponse
 
 from django.shortcuts import render
+import json
 
+from Home.models import Progress
 from TVD_Distributed.settings import MEDIA_ROOT, MEDIA_URL
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 
 def requirements(request):
@@ -29,6 +40,11 @@ def requirements(request):
     # # Must close zip for all contents to be written
     # zf.close()
 
+    client_ip = get_client_ip(request)
+    progress_obj = Progress.objects.get_or_create(ip=client_ip)
+    progress_obj.status = 0
+    progress_obj.save()
+
     filename = 'requirements.zip'
     zipf = zipfile.ZipFile(os.path.join(MEDIA_ROOT, filename), 'w', zipfile.ZIP_DEFLATED)
     path = '/home/shibashis/DMW/'
@@ -46,10 +62,33 @@ def requirements(request):
         fdir, fname = os.path.split(file)
         zipf.write(file, fname)
     zipf.close()
-
-    return HttpResponse(MEDIA_URL + filename)
+    response = {
+        'url': MEDIA_URL + filename,
+        'file': 'requirements.txt'
+    }
+    return HttpResponse(json.dumps(response))
 
 
 #
 def zip(request):
     return HttpResponse(MEDIA_URL + 'requirements.zip')
+
+
+def get_status(request):
+    result = {}
+    for each in Progress.objects.all():
+        result['uid'] = each.ip
+        result['status'] = 'done' if each.status_type == 2 else result[
+            'status'] = 'processing' if each.status_type == 1 else result['status'] = 'No'
+    return HttpResponse(json.dumps(result))
+        # // var
+    # result = "[{\"uid\": 1, \"status\": \"done\"},\
+    #                    //             {\"uid\": 2, \"status\": \"done\"},\
+    #                    //             {\"uid\": 4, \"status\": \"processing\"},\
+    #                    //             {\"uid\": 5, \"status\": \"No\"},\n\
+    #                    //             {\"uid\": 6, \"status\": \"done\"},\n                        \
+    #                    //             {\"uid\": 7, \"status\": \"processing\"},\n\
+    #                    //             {\"uid\": 8, \"status\": \"No\"},\n\
+    #                    //             {\"uid\": 9, \"status\": \"done\"},\n \
+    #                    //             {\"uid\": 10, \"status\": \"processing\"}]";
+
