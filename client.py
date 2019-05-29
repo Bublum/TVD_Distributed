@@ -32,8 +32,8 @@ def dependency_request():
 
     url = SERVER_IP + 'requirements/'
 
-    # r = requests.post(url=url)
-
+    r = requests.get(url=url)
+    print(r.status_code)
     os.system('ls')
 
 
