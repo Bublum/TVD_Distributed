@@ -11,7 +11,6 @@ from TVD_Distributed.config import SERVER_IP
 
 def download_file(url):
     local_filename = url.split('/')[-1]
-    # NOTE the stream=True parameter below
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
@@ -23,18 +22,9 @@ def download_file(url):
 
 
 def request_to_server():
-    url = "http://maps.googleapis.com/maps/api/geocode/json"
-    # data = json.dumps({'type': 'free'})
 
-    file_names = requests.get(url=URL)
-
-    r = requests.post(url=url, data=data)
-    print(file_names.content.decode('utf-8'))
-    # files = file_names['file_names']
-
-    # urllib.request.urlretrieve(file_url, file_name)
-    #
-    # print(r)
+    file_url = requests.get(url=URL)
+    download_file(file_url.content.decode('utf-8'))
 
 def execute_file(files):
     dir = ''
@@ -42,6 +32,10 @@ def execute_file(files):
         path = dir + '/' +  file
         code = subprocess.check_call(["python3", path + ' ' + data], stdout=subprocess.PIPE)
 
+def send_file(files):
+    for file in files:
+        with open(file,'rb') as f:
+            r = requests.post(URL, files={file: f})
 
 
 def dependency_request():
@@ -54,6 +48,6 @@ def dependency_request():
 
 
 if __name__ == '__main__':
-    execute_file()
+    # execute_file()
     # dependency_request()
-    # request_to_server()
+    request_to_server()
