@@ -80,11 +80,17 @@ def dependency_request():
     command = ''
     for each in f:
         print(each[:-1])
-        command += pip_command + each[:-1] + ';'
+        command = pip_command + os.path.join(DATA_PATH, REQUIREMENTS_PATH, each[:-1])
+        print(command)
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+        # for line in iter(process.stdout.readline, b''):  # replace '' with b'' for Python 3
+        #     print(line.decode('utf-8'))
+        #     if line.decode('utf-8').lower().__contains__('would'):
+        #         print('contains')
+        #         process.stdin.write(str.encode('y\n'))
+        proc_stdout = process.communicate()[0].strip().decode("utf-8")
+        print(proc_stdout)
     print(command)
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
-    proc_stdout = process.communicate()[0].strip().decode("utf-8")
-    print(proc_stdout)
 
 
 if __name__ == '__main__':
