@@ -4,7 +4,7 @@ import subprocess
 import requests
 import zipfile
 
-from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE
+from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE,PROCESSING_PATH
 
 
 def download_file(url):
@@ -34,11 +34,11 @@ def request_assets_for_processing():
     downloaded_file = download_file(url)
 
     with zipfile.ZipFile(downloaded_file, 'r') as z:
-        print(z.extractall(path=PROCESSING_DIR))
+        print(z.extractall(path=DATA_PATH + PROCESSING_PATH))
 
 
 def execute_file():
-    dir = PROCESSING_DIR
+    dir = DATA_PATH + PROCESSING_PATH
     files = os.listdir(dir)
 
 
