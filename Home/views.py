@@ -10,7 +10,6 @@ from TVD_Distributed.settings import MEDIA_ROOT, MEDIA_URL
 
 
 def requirements(request):
-    filenames = ["/home/shibashis/decryptor.py", "/home/shibashis/LED.html"]
 
     # zip_subdir = "/home/shibashis/Videos/something"
     # zip_filename = zip_subdir + ".zip"
@@ -34,10 +33,11 @@ def requirements(request):
     filename = 'requirements.zip'
     zipf = zipfile.ZipFile(os.path.join(MEDIA_ROOT, filename), 'w', zipfile.ZIP_DEFLATED)
     path = '/home/shibashis/DMW/'
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            zipf.write(os.path.join(root, file), file)
 
+    files = ["/home/shibashis/decryptor.py", "/home/shibashis/LED.html"]
+    for file in files:
+        fdir, fname = os.path.split(file)
+        zipf.write(file, fname)
     zipf.close()
 
     return HttpResponse(MEDIA_URL + filename)
