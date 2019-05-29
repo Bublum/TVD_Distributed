@@ -1,3 +1,5 @@
 .idea*
 /media/
 *.xml
+data/*
+virtual_environments/*
