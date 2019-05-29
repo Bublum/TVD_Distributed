@@ -75,14 +75,17 @@ def dependency_request():
 
     file_path = os.path.join(DATA_PATH, REQUIREMENTS_PATH, 'requirements.txt')
     f = open(file_path, 'r')
-    command = 'cd {0}/{1}/bin/pip;pip3 --version;'.format(VIRTUAL_ENV_PATH, V_ENV)
-    # for each in f:
-    #     print(each[:-1])
-    #     command += 'pip3 install {0};'.format(each[:-1])
+    pip_command = '{0}/{1}/bin/pip install '.format(VIRTUAL_ENV_PATH, V_ENV)
+    # command = '{0}/{1}/bin/pip install'.format(VIRTUAL_ENV_PATH, V_ENV)
+    command = ''
+    for each in f:
+        print(each[:-1])
+        command += pip_command + each[:-1] + ';'
     print(command)
-    process = subprocess.Popen(command, stdout=subprocess.PIPE,shell=True)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     proc_stdout = process.communicate()[0].strip().decode("utf-8")
     print(proc_stdout)
+
 
 if __name__ == '__main__':
     # pass
