@@ -68,11 +68,6 @@ def requirements(request):
     return HttpResponse(json.dumps(response))
 
 
-#
-def zip(request):
-    return HttpResponse(MEDIA_URL + 'requirements.zip')
-
-
 def get_files(request):
     if request.method == 'GET':
         folder_path_to_send = MEDIA_ROOT + '/to_send/helmet/'
