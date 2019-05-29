@@ -18,7 +18,7 @@ def download_file(url, path):
         counter = 1
         with open(file_path, 'wb') as f:
             for chunk in r.iter_content(chunk_size=DATA_CHUNK_SIZE):
-                print(counter * 81920 / 1024)
+                print(counter * DATA_CHUNK_SIZE / 1024)
                 counter += 1
                 if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
