@@ -1,7 +1,9 @@
 import json
 import os
+import re
 import subprocess
 import requests
+import zipfile
 
 from TVD_Distributed.config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE
 
@@ -25,14 +27,27 @@ def download_file(url):
     return local_filename
 
 
-def request_to_server():
-    url = "http://maps.googleapis.com/maps/api/geocode/json"
+def request_assets_for_processing():
 
-    data = json.dumps({'type': 'request_file'})
+    file_url = requests.get(url=SERVER_IP + '/get_files/')
+    url = SERVER_IP +  file_url.text
+    print(url)
+    downloaded_file = download_file(url)
 
-    r = requests.post(url=url, data=data)
+    with zipfile.ZipFile(downloaded_file, 'r') as z:
+        print(z.extractall(path=PROCESSING_DIR))
 
-    print(r)
+
+def execute_file():
+    dir = PROCESSING_DIR
+    files = os.listdir(dir)
+
+
+
+def send_file(files):
+    for file in files:
+        with open(file,'rb') as f:
+            r = requests.post(URL, files={file: f})
 
 
 def create_virtual_env():
@@ -61,6 +76,8 @@ def dependency_request():
 
 
 if __name__ == '__main__':
+    # pass
+    # dependency_request()
 
     if CREATE_VIRTUAL_ENV:
         create_virtual_env()
