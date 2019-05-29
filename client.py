@@ -2,6 +2,7 @@ import json
 import subprocess
 import requests
 
+from TVD_Distributed.config import SERVER_IP
 
 
 def request_to_server():
@@ -16,7 +17,7 @@ def request_to_server():
 
 def dependency_request():
 
-
+    url = SERVER_IP + '/requirements'
 
 
 if __name__ == '__main__':
