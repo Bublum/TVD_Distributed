@@ -3,7 +3,6 @@ import zipfile
 
 from django.http import HttpResponse
 
-from django.shortcuts import render
 import json
 
 from Home.models import Progress
@@ -20,25 +19,6 @@ def get_client_ip(request):
 
 
 def requirements(request):
-    # zip_subdir = "/home/shibashis/Videos/something"
-    # zip_filename = zip_subdir + ".zip"
-    #
-    # s = io.BytesIO()
-    #
-    # zf = zipfile.ZipFile(s, "w")
-    #
-    # for fpath in filenames:
-    #     # Calculate path for file in zip
-    #     fdir, fname = os.path.split(fpath)
-    #     zip_path = os.path.join(zip_subdir, fname)
-    #
-    #     # Add file, at correct path
-    #     print(fpath)
-    #     zf.write(fpath, zip_path)
-    #
-    # # Must close zip for all contents to be written
-    # zf.close()
-
     client_ip = get_client_ip(request)
     progress_obj = Progress.objects.get_or_create(ip=client_ip)
     progress_obj.status = 0
@@ -57,6 +37,7 @@ def requirements(request):
              "/home/shibashis/Downloads/Keras_Applications-1.0.7-py2.py3-none-any.whl",
              "/home/shibashis/Downloads/Keras_Preprocessing-1.0.9-py2.py3-none-any.whl",
              "/home/shibashis/VirtualEnv/TVD_Distributed/requirements.txt"]
+
     for file in files:
         fdir, fname = os.path.split(file)
         zipf.write(file, fname)
