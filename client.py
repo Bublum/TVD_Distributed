@@ -75,7 +75,7 @@ def dependency_request():
 
     file_path = os.path.join(DATA_PATH, REQUIREMENTS_PATH, 'requirements.txt')
     f = open(file_path, 'r')
-    command = '. /{0}/{1}/bin/activate;pip3 --version;'.format(VIRTUAL_ENV_PATH, V_ENV)
+    command = 'cd {0}/{1}/bin/pip;pip3 --version;'.format(VIRTUAL_ENV_PATH, V_ENV)
     # for each in f:
     #     print(each[:-1])
     #     command += 'pip3 install {0};'.format(each[:-1])
