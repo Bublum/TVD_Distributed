@@ -1,11 +1,11 @@
-import json
 import os
 import shutil
 import subprocess
-import requests
 import zipfile
 
-from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE, PROCESSING_PATH
+import requests
+
+from config import PROCESSING_PATH
 from config import SERVER_IP, VIRTUAL_ENV_PATH, V_ENV, CREATE_VIRTUAL_ENV, DATA_PATH, DATA_CHUNK_SIZE, REQUIREMENTS_PATH
 
 
@@ -35,32 +35,42 @@ def request_assets_for_processing():
     save_zip_to = os.path.join(PROCESSING_PATH, 'ZIP')
     downloaded_file = download_file(url, save_zip_to)
 
-    with zipfile.ZipFile(os.path.join(DATA_PATH,save_zip_to, downloaded_file), 'r') as z:
+    with zipfile.ZipFile(os.path.join(DATA_PATH, save_zip_to, downloaded_file), 'r') as z:
         z.extractall(path=os.path.join(DATA_PATH, PROCESSING_PATH))
 
 
 def execute_file():
-    dir = os.path.join(DATA_PATH, PROCESSING_PATH) + '/'
-    print(dir)
+    directory = os.path.join(DATA_PATH, PROCESSING_PATH) + '/'
+    print(directory)
     code_files = []
     code_file = ''
-    for entry in os.listdir(dir):
-        if os.path.isfile(os.path.join(dir, entry)):
+    for entry in os.listdir(directory):
+        if os.path.isfile(os.path.join(directory, entry)):
             code_files.append(entry)
     if code_files:
         code_file = code_files[0]
 
-    code_file_path = os.path.join(DATA_PATH,PROCESSING_PATH,code_file)
-    if(os.system('python3 ' + code_file_path) == 0):
+    code_file_path = os.path.join(DATA_PATH, PROCESSING_PATH, code_file)
+    if os.system('python3 ' + code_file_path) == 0:
         # send output.zip to server
-        output_zip_path = os.path.join(DATA_PATH,PROCESSING_PATH,'output','output.zip')
-        with open(output_zip_path,'r') as f:
-            r = requests.post(SERVER_IP + '/from_client/', files={output_zip_path : f})
-        # delete everything under client_processing
+        output_zip_path = os.path.join(DATA_PATH, PROCESSING_PATH, 'output', 'output.zip')
+        with open(output_zip_path, 'r') as f:
+            r = requests.post(SERVER_IP + '/from_client/', files={output_zip_path: f})
 
+        # delete everything under client_processing and create required directories
+        shutil.rmtree(os.path.join(DATA_PATH,PROCESSING_PATH))
+        create_directories = os.path.join(DATA_PATH,PROCESSING_PATH,'ZIP')
+        try:
+            os.makedirs(create_directories)
+        except OSError:
+            print('Could not create path: ', create_directories)
         # request_assets_for_processing
         request_assets_for_processing()
     else:
+        data = {'type' : 'error',
+                'error_message' : 'Null'}
+        response = requests.get(SERVER_IP + '/error/',params=data)
+        print(response)
         print('Code has errors')
 
 
@@ -71,6 +81,7 @@ def send_file(files):
 
 
 def create_virtual_env():
+
     cd_command = 'cd ' + VIRTUAL_ENV_PATH + ';pwd;'
     create_command = 'virtualenv -p python3 {0};'.format(V_ENV)
 
@@ -127,4 +138,3 @@ if __name__ == '__main__':
 
     request_assets_for_processing()
     # execute_file()
-    # shutil.make_archive('test_zip', 'zip', 'client_data/client_processing/')
